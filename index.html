@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Untuk Kamu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="nat.css">
+</head>
+<body>
+
+  <!-- MUSIK: taruh file lagu bernama musik.mp3 di folder yang sama, atau ganti nama file di bawah -->
+  <audio id="musik" src="musik.mp3" loop preload="auto"></audio>
+
+  <!-- Layar pembuka: browser hanya mengizinkan musik setelah ada sentuhan/klik -->
+  <div class="gate" id="gate">
+    <p class="gate-title">Ada sesuatu untukmu</p>
+    <button class="gate-btn" id="buka" type="button">Buka</button>
+  </div>
+
+  <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Putar atau jeda musik">Musik: mati</button>
+
+  <main>
+    <!-- EDIT: judul dan kalimat pembuka -->
+    <header class="hero">
+      <h1>Untuk kamu,<br>Nathalie</h1>
+      <p>Wkwkwkwk Aku Iseng aja Bikin Ini Buat Kamu.</p>
+    </header>
+
+    <!-- EDIT: ganti foto, teks alt, dan keterangan. Salin satu <figure> untuk menambah foto -->
+    <section class="stage" aria-label="Foto kenangan">
+      <figure class="photo" style="--r:-3deg">
+        <div class="frame"><img src="foto3.jpg" alt="Foto pertama">
+          <figcaption>Tertawa tanpa alasan</figcaption>
+        </div>
+      </figure>
+
+      <figure class="photo" style="--r:2deg">
+        <div class="frame"><img src="foto1.jpg" alt="Foto kedua">
+          <figcaption>Senyum yang paling tenang</figcaption>
+        </div>
+      </figure>
+
+      <figure class="photo" style="--r:-1.5deg">
+        <div class="frame"><img src="foto2.jpg" alt="Foto ketiga">
+          <figcaption>Dan tingkah lucumu</figcaption>
+        </div>
+      </figure>
+    </section>
+
+    <!-- EDIT: surat singkat -->
+    <section class="letter">
+      <h2>Sebuah catatan</h2>
+      <p>Aku tidak pandai merangkai kata, jadi kubuat halaman kecil ini. Terima kasih sudah hadir dan membuat hari-hariku terasa lebih ringan.</p>
+      <p>Makasih nya mau temenan sama orang aneh kayak aku.</p>
+      <p class="sign">Dari aku</p>
+    </section>
+  </main>
+
+  <script>
+    // ----- Musik -----
+    const musik = document.getElementById('musik');
+    const gate = document.getElementById('gate');
+    const tombolSuara = document.getElementById('sound');
+
+    function setLabel() {
+      const nyala = !musik.paused;
+      tombolSuara.textContent = nyala ? 'Musik: nyala' : 'Musik: mati';
+      tombolSuara.setAttribute('aria-pressed', nyala);
+    }
+    document.getElementById('buka').addEventListener('click', () => {
+      gate.classList.add('hide');
+      musik.volume = 0.6;
+      musik.play().catch(() => {}).finally(setLabel);
+    });
+    tombolSuara.addEventListener('click', () => {
+      musik.paused ? musik.play().catch(() => {}) : musik.pause();
+      setLabel();
+    });
+
+    // ----- Foto melayang saat disentuh kursor atau jari -----
+    document.querySelectorAll('.photo').forEach((el) => {
+      const frame = el.querySelector('.frame');
+      const kuat = 9; // derajat kemiringan maksimum
+
+      function miring(e) {
+        const b = el.getBoundingClientRect();
+        const x = (e.clientX - b.left) / b.width - 0.5;
+        const y = (e.clientY - b.top) / b.height - 0.5;
+        frame.style.setProperty('--rx', (-y * kuat).toFixed(2) + 'deg');
+        frame.style.setProperty('--ry', (x * kuat).toFixed(2) + 'deg');
+      }
+      function lepas() {
+        el.classList.remove('lift');
+        frame.style.setProperty('--rx', '0deg');
+        frame.style.setProperty('--ry', '0deg');
+      }
+      el.addEventListener('pointerenter', (e) => { el.classList.add('lift'); miring(e); });
+      el.addEventListener('pointerdown', (e) => { el.classList.add('lift'); miring(e); });
+      el.addEventListener('pointermove', miring);
+      el.addEventListener('pointerleave', lepas);
+      el.addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') lepas(); });
+      el.addEventListener('pointercancel', lepas);
+    });
+  </script>
+</body>
+</html>
